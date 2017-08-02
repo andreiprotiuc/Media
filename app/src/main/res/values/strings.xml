@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Media</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_play_list">Play Lists</string>
+    <string name="title_create_playlist">Create PlayList</string>
+    <string name="title_save">Save</string>
 </resources>

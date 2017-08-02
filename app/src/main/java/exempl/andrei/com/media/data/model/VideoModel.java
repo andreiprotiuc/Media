@@ -1,5 +1,6 @@
-package exempl.andrei.com.media.model;
+package exempl.andrei.com.media.data.model;
 
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -11,9 +12,16 @@ import android.os.Parcelable;
 public class VideoModel implements Parcelable {
     private String mTitle;
     private Uri mUri;
+    private boolean mChecked;
 
     public VideoModel() {
 
+    }
+
+    public VideoModel(Cursor cursor) {
+        mTitle = cursor.getString(1);
+        mUri = Uri.parse(cursor.getString(0));
+        mChecked = false;
     }
 
     protected VideoModel(Parcel in) {
@@ -58,5 +66,13 @@ public class VideoModel implements Parcelable {
 
     public void setmUri(Uri mUri) {
         this.mUri = mUri;
+    }
+
+    public boolean ismChecked() {
+        return mChecked;
+    }
+
+    public void setmChecked(boolean mChecked) {
+        this.mChecked = mChecked;
     }
 }

@@ -1,0 +1,26 @@
+package exempl.andrei.com.media.data.model;
+
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.Query;
+
+import java.util.List;
+
+/**
+ * Created by andreiprotiuc on 8/2/17.
+ */
+@Dao
+public interface PlayListDao {
+    @Query("Select * FROM playlist WHERE name=(:name)")
+    PlayList getPlayListByName(String name);
+
+    @Query("Select * FROM playlist")
+    List<PlayList> getAll();
+
+    @Delete
+    void delete(PlayList playList);
+
+    @Insert
+    void insert(PlayList playList);
+}

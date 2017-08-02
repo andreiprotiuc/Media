@@ -1,7 +1,6 @@
 package exempl.andrei.com.media;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -10,9 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -20,61 +17,56 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import exempl.andrei.com.media.data.VideoAdapter;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, VideoAdapter.VideoListener {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
     private static final int TASK_LOADER_ID = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = RESULT_FIRST_USER + 1;
-    private TextView mTextMessage;
     private VideoAdapter mAdapter;
-
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
-                    return true;
-            }
-            return false;
-        }
-
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerView.setHasFixedSize(true);
         mAdapter = new VideoAdapter(null, this);
         mRecyclerView.setAdapter(mAdapter);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         if (checkPermission()) {
-            printNamesToLogCat(this);
+            printNamesToLogCat();
         } else {
             requestPermission();
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.navigation, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.navigation_create_play_list:
+                startActivity(new Intent(this, CreatePlayListActivity.class));
+                return true;
+            case R.id.navigation_play_lists:
+                startActivity(new Intent(this, PlayListActivity.class));
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private boolean checkPermission() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
@@ -86,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
     }
 
-    public void printNamesToLogCat(Context context) {
+    public void printNamesToLogCat() {
         getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, this);
     }
 
@@ -100,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay! Do the
-                    printNamesToLogCat(this);
+                    printNamesToLogCat();
 
                 } else {
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
@@ -163,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Toast.makeText(this, "position " + position, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(this, PlayerActivity.class);
         intent.putExtra(PlayerActivity.EXTRA_POSITION, position);
-        //intent.setData(mAdapter.getModelList().gt(position).getmUri());
         intent.putParcelableArrayListExtra(PlayerActivity.EXTRA_LIST, (ArrayList<? extends Parcelable>) mAdapter.getModelList());
         startActivity(intent);
     }

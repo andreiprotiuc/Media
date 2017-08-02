@@ -1,4 +1,4 @@
-package exempl.andrei.com.media;
+package exempl.andrei.com.media.data;
 
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,7 +14,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import exempl.andrei.com.media.model.VideoModel;
+import exempl.andrei.com.media.R;
+import exempl.andrei.com.media.data.model.VideoModel;
 
 /**
  * Created by andreiprotiuc on 8/1/17.

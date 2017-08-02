@@ -15,6 +15,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.LoopingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
@@ -23,7 +24,7 @@ import com.google.android.exoplayer2.util.Util;
 
 import java.util.List;
 
-import exempl.andrei.com.media.model.VideoModel;
+import exempl.andrei.com.media.data.model.VideoModel;
 
 /**
  * Created by andreiprotiuc on 8/1/17.
@@ -105,8 +106,10 @@ public class PlayerActivity extends AppCompatActivity {
         for (int i = 0; i < mExtraList.size(); i++) {
             mediaSources[i] = buildMediaSource(mExtraList.get(i).getmUri());
         }
-        MediaSource mediaSource = mediaSources.length == 1 ? mediaSources[0]
-                : new ConcatenatingMediaSource(mediaSources);
+        // MediaSource mediaSource = mediaSources.length == 1 ? mediaSources[0]
+        //        : new ConcatenatingMediaSource(mediaSources);
+        MediaSource mediaSource = new LoopingMediaSource(mediaSources.length == 1 ? mediaSources[0]
+                : new ConcatenatingMediaSource(mediaSources));
 
         boolean haveResumePosition = currentWindow != C.INDEX_UNSET;
 
