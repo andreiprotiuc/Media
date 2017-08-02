@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.navigation_create_play_list:
-                startActivity(new Intent(this, CreatePlayListActivity.class));
+                CreatePlayListActivity.startActivity(this);
                 return true;
             case R.id.navigation_play_lists:
                 startActivity(new Intent(this, PlayListActivity.class));

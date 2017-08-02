@@ -19,6 +19,8 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
 
     public interface PlayListListener {
         void onPlayListSelected(int position);
+
+        void onEditPlayListSelected(int position);
     }
 
     private List<PlayList> mItems;
@@ -49,6 +51,11 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
         return mItems;
     }
 
+    public void updateItems(List<PlayList> items){
+        this.mItems = items;
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView mTitle;
 
@@ -61,6 +68,17 @@ public class SimpleAdapter extends RecyclerView.Adapter<SimpleAdapter.ViewHolder
                     if (mListener != null) {
                         mListener.onPlayListSelected(getAdapterPosition());
                     }
+                }
+            });
+
+            itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (mListener != null) {
+                        mListener.onEditPlayListSelected(getAdapterPosition());
+                        return true;
+                    }
+                    return false;
                 }
             });
         }

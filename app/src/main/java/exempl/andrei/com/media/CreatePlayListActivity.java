@@ -1,5 +1,8 @@
 package exempl.andrei.com.media;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,9 +35,22 @@ import exempl.andrei.com.media.data.model.VideoModel;
 public class CreatePlayListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final int TASK_LOADER_ID = 0;
     private static final String TAG = CreatePlayListActivity.class.getName();
+    public static final String EXTRA_PLAYLIST = "extraPlayList";
 
     private EditAdapter mAdapter;
     private EditText mPlayListNameEditText;
+    private PlayList mPlayList;
+
+    public static void startActivityForResult(Activity activity, PlayList playList, int code) {
+        Intent intent = new Intent(activity, CreatePlayListActivity.class);
+        intent.putExtra(EXTRA_PLAYLIST, playList);
+        activity.startActivityForResult(intent, code);
+    }
+
+    public static void startActivity(Context context) {
+        Intent intent = new Intent(context, CreatePlayListActivity.class);
+        context.startActivity(intent);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,7 +62,17 @@ public class CreatePlayListActivity extends AppCompatActivity implements LoaderM
         mRecyclerView.setHasFixedSize(true);
         mAdapter = new EditAdapter(new ArrayList<VideoModel>());
         mRecyclerView.setAdapter(mAdapter);
+        mPlayList = getIntent().getParcelableExtra(EXTRA_PLAYLIST);
+        if (mPlayList != null) {
+            mPlayListNameEditText.setText(mPlayList.name);
+        }
         getSupportLoaderManager().initLoader(TASK_LOADER_ID, null, this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        setResult(RESULT_CANCELED);
     }
 
     @Override
@@ -59,13 +85,26 @@ public class CreatePlayListActivity extends AppCompatActivity implements LoaderM
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save:
-                PlayList playList = new PlayList();
-                playList.name = mPlayListNameEditText.getText().toString();
-                if (!TextUtils.isEmpty(mAdapter.getSelectedItems())) {
-                    playList.playList = mAdapter.getSelectedItems();
-                    DBManager.getInstance().getAppDataBase(this).playListDao().insert(playList);
-                    finish();
+                if (mPlayList == null) {
+                    PlayList playList = new PlayList();
+                    playList.name = mPlayListNameEditText.getText().toString();
+                    if (!TextUtils.isEmpty(mAdapter.getSelectedItems())) {
+                        playList.playList = mAdapter.getSelectedItems();
+                        DBManager.getInstance().getAppDataBase(this).playListDao().insert(playList);
+                        setResult(RESULT_OK);
+                        finish();
+                    }
+                } else {
+                    mPlayList.name = mPlayListNameEditText.getText().toString();
+                    if (!TextUtils.isEmpty(mAdapter.getSelectedItems())) {
+                        mPlayList.playList = mAdapter.getSelectedItems();
+                        DBManager.getInstance().getAppDataBase(this).playListDao().updatePlayList(mPlayList);
+                        setResult(RESULT_OK);
+                        finish();
+                    }
                 }
+
+
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -113,9 +152,22 @@ public class CreatePlayListActivity extends AppCompatActivity implements LoaderM
         List<VideoModel> items = new ArrayList<>();
         while (data.moveToNext()) {
             VideoModel videoModel = new VideoModel(data);
+            videoModel.setmChecked(isChecked(videoModel.getmUri().toString()));
             items.add(videoModel);
         }
         mAdapter.updateItems(items);
+    }
+
+    private boolean isChecked(String uri) {
+        if (mPlayList != null) {
+            String[] data = mPlayList.playList.split(";");
+            for (String currentUri : data) {
+                if (currentUri.equals(uri)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override
